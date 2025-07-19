@@ -13,7 +13,8 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "npm run test:unit -- --run",
+        "deploy": "npm run build && npx gh-pages -d build -t"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
@@ -24,6 +25,7 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/leaflet": "^1.9.20",
 		"@vitest/browser": "^3.2.3",
+		"gh-pages": "^6.3.0",
 		"playwright": "^1.53.0",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
