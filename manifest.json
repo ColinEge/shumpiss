@@ -9,7 +9,7 @@
     "description": "Location and event tracking application",
     "icons": [
         {
-            "src": "/favicon.svg",
+            "src": "/shumpiss/favicon.svg",
             "sizes": "any",
             "type": "image/svg+xml"
         }
