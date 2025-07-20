@@ -144,9 +144,10 @@
 			on:instanceDeleted={refreshData}
 			on:controlVisibilityChange={handleControlVisibilityChange}
 		>
-			<div slot="view-switcher">
-				<DateSwitchFab on:click={handleSwitchToDate} />
-			</div>
+			<DateSwitchFab 
+				slot="fab" 
+				on:click={handleSwitchToDate} 
+			/>
 		</InteractiveMap>
 	{:else}
 		<DateView

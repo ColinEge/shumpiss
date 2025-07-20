@@ -35,7 +35,7 @@
 
 	// Determine if controls should be hidden
 	$: shouldHideControls = isPopupOpen || panelState !== 'collapsed';
-	
+
 	// Dispatch control visibility changes to parent (with safeguard)
 	$: if (browser) {
 		dispatch('controlVisibilityChange', { shouldHide: shouldHideControls });
@@ -53,7 +53,7 @@
 	function handleMapClick(event: CustomEvent<{ latlng: LatLng }>) {
 		// Don't create new locations if we're currently creating one
 		if (isCreatingLocation || isCreatingInstance) return;
-		
+
 		// Create a new location
 		createPendingLocation(event.detail.latlng);
 	}
@@ -73,12 +73,12 @@
 			lat: event.detail.location.lat,
 			lng: event.detail.location.lng
 		};
-		
+
 		// Show instance creation form
 		isCreatingInstance = true;
 		isCreatingLocation = false;
 		panelState = 'expanded';
-		
+
 		// Focus the map on the location
 		if (mapComponent) {
 			mapComponent.panTo(event.detail.location.lat, event.detail.location.lng, 16);
@@ -88,7 +88,7 @@
 	// Create a pending location that shows on map but isn't saved yet
 	async function createPendingLocation(latlng: LatLng) {
 		console.log('Creating pending location at:', latlng);
-		
+
 		selectedLocation = {
 			lat: latlng.lat,
 			lng: latlng.lng
@@ -98,12 +98,14 @@
 		isCreatingLocation = true;
 		isCreatingInstance = false;
 		panelState = 'expanded';
-		
+
 		console.log('Location creation setup:', { isCreatingLocation, isCreatingInstance, panelState });
 	}
 
 	// Handle panel events
-	function handlePanelStateChange(event: CustomEvent<{ state: 'collapsed' | 'partial' | 'expanded' }>) {
+	function handlePanelStateChange(
+		event: CustomEvent<{ state: 'collapsed' | 'partial' | 'expanded' }>
+	) {
 		panelState = event.detail.state;
 		if (panelState === 'collapsed') {
 			selectedLocation = null;
@@ -115,7 +117,7 @@
 
 	function handleCreateLocation(event: CustomEvent<{ name: string; address?: string }>) {
 		if (!selectedLocation) return;
-		
+
 		// Create the location
 		const newLocation = LocationStorage.addLocation({
 			lat: selectedLocation.lat,
@@ -123,10 +125,10 @@
 			name: event.detail.name,
 			address: event.detail.address
 		});
-		
+
 		locations = [...locations, newLocation];
 		dispatch('locationCreated', { location: newLocation });
-		
+
 		// Reset state
 		isCreatingLocation = false;
 		selectedLocation = null;
@@ -140,9 +142,11 @@
 		panelState = 'collapsed';
 	}
 
-	function handleCreateInstance(event: CustomEvent<{ title: string; description?: string; types: string[] }>) {
+	function handleCreateInstance(
+		event: CustomEvent<{ title: string; description?: string; types: string[] }>
+	) {
 		if (!selectedLocationForInstance) return;
-		
+
 		// Create the instance
 		const newInstance = LocationStorage.addInstance({
 			locationId: selectedLocationForInstance.id,
@@ -150,12 +154,12 @@
 			types: event.detail.types as any[],
 			description: event.detail.description
 		});
-		
+
 		// Reload locations to get updated data with new instance
 		locations = LocationStorage.loadLocations();
-		
+
 		dispatch('instanceCreated', { instance: newInstance });
-		
+
 		// Reset state
 		isCreatingInstance = false;
 		selectedLocationForInstance = null;
@@ -174,22 +178,24 @@
 	// Search functionality
 	async function handleSearch() {
 		if (!browser || !searchQuery.trim() || isSearching) return;
-		
+
 		isSearching = true;
 		try {
-			const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`);
+			const response = await fetch(
+				`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
+			);
 			const results = await response.json();
-			
+
 			if (results.length > 0) {
 				const result = results[0];
 				const lat = parseFloat(result.lat);
 				const lng = parseFloat(result.lon);
-				
+
 				// Pan to location
 				if (mapComponent) {
 					mapComponent.panTo(lat, lng, 15);
 				}
-				
+
 				// Don't show location details panel for search results
 				searchQuery = '';
 			} else {
@@ -218,7 +224,7 @@
 
 	// Navigate to a specific location (and optionally instance) by ID
 	export function navigateToLocation(locationId: string, instanceId?: string) {
-		const location = locations.find(l => l.id === locationId);
+		const location = locations.find((l) => l.id === locationId);
 		if (location && mapComponent) {
 			mapComponent.panTo(location.lat, location.lng, 16);
 			if (instanceId) {
@@ -241,9 +247,9 @@
 	export function getInstancesByDateGrouped() {
 		const allLocations = LocationStorage.loadLocations();
 		const grouped: { [key: string]: (Instance & { location: Location })[] } = {};
-		
-		allLocations.forEach(location => {
-			location.instances.forEach(instance => {
+
+		allLocations.forEach((location) => {
+			location.instances.forEach((instance) => {
 				const dateKey = new Date(instance.createdAt).toDateString();
 				if (!grouped[dateKey]) {
 					grouped[dateKey] = [];
@@ -251,13 +257,13 @@
 				grouped[dateKey].push({ ...instance, location });
 			});
 		});
-		
+
 		return grouped;
 	}
 </script>
 
 <div class="map-wrapper">
-	<MapComponent 
+	<MapComponent
 		bind:this={mapComponent}
 		{initialCenter}
 		{initialZoom}
@@ -267,19 +273,19 @@
 		on:locationClick={handleLocationClick}
 		on:popupOpen={handlePopupOpen}
 	/>
-	
+
 	<!-- Floating controls -->
 	<div class="map-controls" class:hidden={shouldHideControls}>
 		<div class="search-box">
-			<input 
-				type="text" 
-				placeholder="Search for a place..." 
+			<input
+				type="text"
+				placeholder="Search for a place..."
 				class="search-input"
 				bind:value={searchQuery}
 				on:keydown={handleKeydown}
 				disabled={isSearching}
 			/>
-			<button 
+			<button
 				class="search-button"
 				on:click={handleSearch}
 				disabled={isSearching || !searchQuery.trim()}
@@ -288,26 +294,34 @@
 				{#if isSearching}
 					<div class="loading-spinner"></div>
 				{:else}
-					<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="11" cy="11" r="8"/>
-						<path d="m21 21-4.35-4.35"/>
+					<svg
+						class="search-icon"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<circle cx="11" cy="11" r="8" />
+						<path d="m21 21-4.35-4.35" />
 					</svg>
 				{/if}
 			</button>
-			<slot name="view-switcher"></slot>
 		</div>
 	</div>
 
-	<!-- My Location button -->
-	<div class="location-control" class:hidden={shouldHideControls}>
-		<button 
+	<!-- Right-side FAB column -->
+	<div class="fab-column" class:hidden={shouldHideControls}>
+		<slot name="fab"></slot>
+		<button
 			class="location-button"
 			on:click={getCurrentLocation}
 			aria-label="Get my location"
 			title="Get my location"
 		>
 			<svg viewBox="0 0 24 24" fill="currentColor">
-				<path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+				<path
+					d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"
+				/>
 			</svg>
 		</button>
 	</div>
@@ -345,10 +359,32 @@
 		justify-content: center;
 		align-items: flex-start;
 		gap: 16px;
-		transition: opacity 0.3s ease, transform 0.3s ease;
+		transition:
+			opacity 0.3s ease,
+			transform 0.3s ease;
 	}
 
 	.map-controls.hidden {
+		opacity: 0;
+		transform: translateY(-10px);
+		pointer-events: none;
+	}
+
+	/* Right-side FAB column */
+	.fab-column {
+		position: absolute;
+		top: 80px;
+		right: 20px;
+		z-index: 1000;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		transition:
+			opacity 0.3s ease,
+			transform 0.3s ease;
+	}
+
+	.fab-column.hidden {
 		opacity: 0;
 		transform: translateY(-10px);
 		pointer-events: none;
@@ -359,7 +395,7 @@
 		align-items: center;
 		background: white;
 		border-radius: 24px;
-		box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 		overflow: hidden;
 		max-width: 400px;
 		width: 100%;
@@ -414,23 +450,12 @@
 	}
 
 	@keyframes spin {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
-	}
-
-	/* My Location control */
-	.location-control {
-		position: absolute;
-		bottom: 120px;
-		right: 20px;
-		z-index: 1000;
-		transition: opacity 0.3s ease, transform 0.3s ease;
-	}
-
-	.location-control.hidden {
-		opacity: 0;
-		transform: translateY(10px);
-		pointer-events: none;
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 
 	.location-button {
@@ -453,7 +478,7 @@
 		transform: scale(1.05);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 	}
-	
+
 	.location-button:active {
 		transform: scale(1.02);
 	}
@@ -474,24 +499,20 @@
 			max-width: none;
 		}
 
-		.location-control {
-			bottom: 100px;
+		.fab-column {
+			top: 80px;
 			right: 10px;
+			gap: 10px;
 		}
 
 		.location-button {
 			width: 44px;
 			height: 44px;
 		}
-		
+
 		.location-button svg {
 			width: 18px;
 			height: 18px;
-		}
-
-		.location-button {
-			width: 44px;
-			height: 44px;
 		}
 	}
 </style>

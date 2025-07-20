@@ -16,9 +16,6 @@
 
 <style>
 	.date-fab {
-		position: absolute;
-		top: 60px;
-		right: 20px;
 		width: 48px;
 		height: 48px;
 		border-radius: 50%;
@@ -33,6 +30,7 @@
 		z-index: 1000;
 		/* Match the transition from search controls */
 		transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
+		flex-shrink: 0;
 	}
 	
 	.date-fab.hidden {
@@ -58,8 +56,6 @@
 	
 	@media (max-width: 768px) {
 		.date-fab {
-			top: 60px;
-			right: 10px;
 			width: 44px;
 			height: 44px;
 		}
