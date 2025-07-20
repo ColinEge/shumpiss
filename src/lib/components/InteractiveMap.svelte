@@ -15,6 +15,7 @@
 		instanceUpdated: { instance: Instance };
 		locationDeleted: { locationId: string };
 		instanceDeleted: { locationId: string; instanceId: string };
+		controlVisibilityChange: { shouldHide: boolean };
 	}>();
 
 	export let initialCenter: [number, number] = [53.4076, -2.9921];
@@ -34,6 +35,11 @@
 
 	// Determine if controls should be hidden
 	$: shouldHideControls = isPopupOpen || panelState !== 'collapsed';
+	
+	// Dispatch control visibility changes to parent (with safeguard)
+	$: if (browser) {
+		dispatch('controlVisibilityChange', { shouldHide: shouldHideControls });
+	}
 
 	// Load locations from storage on mount
 	onMount(() => {
@@ -288,6 +294,7 @@
 					</svg>
 				{/if}
 			</button>
+			<slot name="view-switcher"></slot>
 		</div>
 	</div>
 
@@ -299,9 +306,8 @@
 			aria-label="Get my location"
 			title="Get my location"
 		>
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-				<path d="M12 1v6M12 17v6M5.6 5.6l4.2 4.2M14.2 14.2l4.2 4.2M1 12h6M17 12h6M5.6 18.4l4.2-4.2M14.2 9.8l4.2-4.2" />
+			<svg viewBox="0 0 24 24" fill="currentColor">
+				<path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
 			</svg>
 		</button>
 	</div>
@@ -337,6 +343,8 @@
 		z-index: 1000;
 		display: flex;
 		justify-content: center;
+		align-items: flex-start;
+		gap: 16px;
 		transition: opacity 0.3s ease, transform 0.3s ease;
 	}
 
@@ -430,22 +438,29 @@
 		height: 48px;
 		background: white;
 		border: none;
-		border-radius: 8px;
-		box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+		border-radius: 50%;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: #5f6368;
+		transition: all 0.3s ease;
 	}
 
 	.location-button:hover {
 		background: #f8f9fa;
+		transform: scale(1.05);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+	}
+	
+	.location-button:active {
+		transform: scale(1.02);
 	}
 
 	.location-button svg {
-		width: 24px;
-		height: 24px;
+		width: 20px;
+		height: 20px;
 	}
 
 	/* Responsive design */
@@ -462,6 +477,16 @@
 		.location-control {
 			bottom: 100px;
 			right: 10px;
+		}
+
+		.location-button {
+			width: 44px;
+			height: 44px;
+		}
+		
+		.location-button svg {
+			width: 18px;
+			height: 18px;
 		}
 
 		.location-button {

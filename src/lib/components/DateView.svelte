@@ -10,10 +10,12 @@
 	const dispatch = createEventDispatcher<{
 		navigateToPin: { pinId: string };
 		navigateToLocation: { locationId: string; instanceId?: string };
+		switchView: { view: 'map' | 'date' };
 	}>();
 	
 	export let pins: Pin[] = [];
 	export let locations: Location[] = [];
+	export let totalItems: number = 0;
 	
 	let sortOrder: 'desc' | 'asc' = 'desc';
 	let searchTerm: string = '';
@@ -164,18 +166,33 @@
 		logger.debug('All filters cleared');
 	}
 	
+	function handleBackToMap() {
+		dispatch('switchView', { view: 'map' });
+	}
+	
 	// Count total filtered pins
 	$: totalFilteredItems = Object.values(groupedItems).flat().length;
 </script>
 
 <div class="date-view">
-	<!-- Header with controls -->
-	<div class="header">
-		<h2 class="title">Pins by Date</h2>
-		<div class="subtitle">
-			{totalFilteredItems} of {pins.length + locations.reduce((sum, loc) => sum + loc.instances.length, 0)} items
+	<!-- Back button -->
+	<div class="back-header">
+		<button 
+			class="back-btn"
+			on:click={handleBackToMap}
+			title="Back to Map"
+			aria-label="Back to Map"
+		>
+			<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+				<path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+			</svg>
+		</button>
+		<h1 class="page-title">Timeline</h1>
+		<div class="item-count">
+			{totalItems} item{totalItems === 1 ? '' : 's'}
 		</div>
 	</div>
+
 	
 	<!-- Search and filters -->
 	<div class="controls">
@@ -333,6 +350,72 @@
 </div>
 
 <style>
+	.back-header {
+		display: flex;
+		align-items: center;
+		background: white;
+		border-bottom: 1px solid #e8eaed;
+		padding: 12px 20px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		margin: -20px -20px 20px -20px;
+		gap: 16px;
+	}
+	
+	.back-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		background: none;
+		border: 1px solid #e8eaed;
+		border-radius: 50%;
+		cursor: pointer;
+		color: #5f6368;
+		transition: all 0.2s ease;
+		flex-shrink: 0;
+	}
+	
+	.back-btn:hover {
+		background: #f8f9fa;
+		border-color: #dadce0;
+		transform: translateY(-1px);
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	}
+	
+	.page-title {
+		font-size: 24px;
+		font-weight: 500;
+		color: #202124;
+		margin: 0;
+		flex: 1;
+	}
+	
+	.item-count {
+		font-size: 14px;
+		color: #5f6368;
+		font-weight: 400;
+	}
+	
+	.pin-count {
+		font-size: 14px;
+		color: #5f6368;
+		font-weight: 500;
+		padding: 8px 12px;
+		background: #f8f9fa;
+		border-radius: 16px;
+		border: 1px solid #e8eaed;
+	}
+
+	.count-breakdown {
+		font-size: 12px;
+		opacity: 0.8;
+		margin-left: 4px;
+	}
+
 	.date-view {
 		padding: 20px;
 		max-width: 800px;
@@ -761,6 +844,24 @@
 	
 	/* Mobile responsive */
 	@media (max-width: 768px) {
+		.back-header {
+			padding: 8px 12px;
+			margin: -12px -12px 12px -12px;
+		}
+		
+		.back-btn {
+			width: 40px;
+			height: 40px;
+		}
+		
+		.page-title {
+			font-size: 20px;
+		}
+		
+		.item-count {
+			font-size: 12px;
+		}
+		
 		.date-view {
 			padding: 12px;
 		}

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
 		<!-- PWA Manifest -->
-		<link rel="manifest" href="/manifest.json" />
+		<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
 		<meta name="theme-color" content="#2563eb" />
 		<meta name="application-name" content="Shumpiss" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,11 +24,12 @@
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 		
-		<!-- Service Worker Registration -->
+		<!-- Service Worker Registration (temporarily disabled for debugging) -->
+		<!-- 
 		<script>
 			if ('serviceWorker' in navigator) {
 				window.addEventListener('load', () => {
-					navigator.serviceWorker.register('/sw-caching.js')
+					navigator.serviceWorker.register('%sveltekit.assets%/sw-caching.js')
 						.then((registration) => {
 							console.log('SW registered: ', registration);
 						})
@@ -38,5 +39,6 @@
 				});
 			}
 		</script>
+		-->
 	</body>
 </html>

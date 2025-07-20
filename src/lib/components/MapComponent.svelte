@@ -56,24 +56,16 @@
 				attributionControl: false
 			});
 
-			// Add tile layer
-			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				maxZoom: 19,
-				attribution: ''
-			}).addTo(map);
+		// Add tile layer
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: ''
+		}).addTo(map);
 
-			// Custom zoom controls
-			const zoomControl = L.control.zoom({
-				position: 'bottomright'
-			});
-			zoomControl.addTo(map);
-
-			// Add click handler
-			map.on('click', (e: any) => {
-				dispatch('mapClick', { latlng: e.latlng });
-			});
-
-			// Add popup event listeners
+		// Add click handler
+		map.on('click', (e: any) => {
+			dispatch('mapClick', { latlng: e.latlng });
+		});			// Add popup event listeners
 			map.on('popupopen', () => {
 				isPopupOpen = true;
 				dispatch('popupOpen', { open: true });

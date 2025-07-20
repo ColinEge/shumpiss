@@ -1,15 +1,15 @@
 {
     "name": "Shumpiss",
     "short_name": "Shumpiss",
-    "start_url": "/",
+    "start_url": "/shumpiss/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2563eb",
-    "scope": "/",
+    "scope": "/shumpiss/",
     "description": "Location and event tracking application",
     "icons": [
         {
-            "src": "/favicon.svg",
+            "src": "/shumpiss/favicon.svg",
             "sizes": "any",
             "type": "image/svg+xml"
         }

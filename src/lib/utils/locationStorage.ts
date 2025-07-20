@@ -1,13 +1,8 @@
 import { browser } from '$app/environment';
 import { APP_CONFIG, ERROR_MESSAGES } from '$lib/constants';
 import { logger, AppError, handleSyncError } from '$lib/utils/logger';
+import { PinType } from './pinStorage';
 import type { Location, Instance, SerializedLocation, SerializedInstance, LocationCreationData, InstanceCreationData } from '$lib/types';
-
-export enum PinType {
-    Shit = 'shit',
-    Cum = 'cum',
-    Piss = 'piss'
-}
 
 const { PIN_STORAGE_KEY } = APP_CONFIG.STORAGE;
 const LOCATIONS_STORAGE_KEY = 'map-locations'; // New storage key for locations
@@ -288,5 +283,4 @@ export class LocationStorage {
 	}
 }
 
-// Keep the old PinStorage class for backward compatibility during migration
-export { PinStorage, type Pin } from './pinStorage';
+// Note: PinStorage and Pin are exported through the main lib index.ts

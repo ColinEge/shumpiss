@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	import { PinType } from '$lib/utils/pinStorage';
 	import type { Location } from '$lib/types';
 	import { createEventDispatcher } from 'svelte';
@@ -44,14 +43,17 @@
 		const rect = panelElement.getBoundingClientRect();
 		startHeight = window.innerHeight - rect.top;
 
-		document.addEventListener('mousemove', handlePanelDrag);
+		document.addEventListener('mousemove', handlePanelDrag, { passive: false });
 		document.addEventListener('mouseup', handlePanelDragEnd);
-		document.addEventListener('touchmove', handlePanelDrag);
+		document.addEventListener('touchmove', handlePanelDrag, { passive: false });
 		document.addEventListener('touchend', handlePanelDragEnd);
 	}
 
 	function handlePanelDrag(event: MouseEvent | TouchEvent) {
 		if (!isDragging) return;
+
+		// Prevent default to avoid scrolling issues, but only if we're actually dragging
+		event.preventDefault();
 
 		const currentY = 'touches' in event ? event.touches[0].clientY : event.clientY;
 		const deltaY = startY - currentY;
@@ -136,7 +138,6 @@
 		newLocationAddress = '';
 		dispatch('cancelLocation');
 	}
-
 </script>
 
 <div 
@@ -336,7 +337,7 @@
 	}
 
 	.bottom-panel.expanded {
-		transform: translateY(20vh);
+		transform: translateY(10vh);
 	}
 
 	.panel-handle {
@@ -720,11 +721,11 @@
 	/* Mobile optimizations */
 	@media (max-width: 768px) {
 		.bottom-panel.expanded {
-			transform: translateY(5vh); /* More space on mobile */
+			transform: translateY(8vh); /* Conservative approach for mobile */
 		}
 
 		.panel-content {
-			height: calc(95vh - 60px);
+			height: calc(92vh - 60px);
 			padding-bottom: 40px; /* Extra padding for buttons */
 		}
 
