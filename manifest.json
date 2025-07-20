@@ -1,7 +1,7 @@
 {
     "name": "Shumpiss",
     "short_name": "Shumpiss",
-    "start_url": "/",
+    "start_url": "/shumpiss",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2563eb",
